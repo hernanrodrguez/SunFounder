@@ -28,12 +28,17 @@
 #include "lcd1602_i2c.h"
 #include "MPU6050.h"
 #include "I2Cdev.h"
+#include "queue.h"
+#include "math.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef struct{
+	float AngleRoll;
+	float AnglePitch;
+}Angle_data;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -42,13 +47,16 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define Buzzer_On HAL_GPIO_WritePin(BuzzerGPIO_GPIO_Port, BuzzerGPIO_Pin, GPIO_PIN_SET);
+#define Buzzer_Off HAL_GPIO_WritePin(BuzzerGPIO_GPIO_Port, BuzzerGPIO_Pin, GPIO_PIN_RESET);
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 
 /* USER CODE BEGIN PV */
+
+QueueHandle_t queueAngle;
 
 /* USER CODE END PV */
 
@@ -64,14 +72,41 @@ static void MX_I2C1_Init(void);
 /* USER CODE BEGIN 0 */
 
 static void MPU6050_Task(void *pvParameters) {
-	int16_t ax, ay, az, gx, gy, gz;
+	int16_t ax, ay, az;
 
-	if (!MPU6050_testConnection()) {
-		return;
-	}
+	float AccXinG,AccYinG,AccZinG;
+
+	Angle_data angle_to_send;
+
+
 	while (1) {
 
-		MPU6050_getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+		MPU6050_getAcceleration(&ax, &ay, &az);
+
+		AccXinG = (float) ax/4096;
+		AccYinG = (float) ay/4096;
+		AccZinG = (float) az/4096;
+
+		angle_to_send.AngleRoll =atan(AccYinG/sqrt(AccXinG*AccXinG+AccZinG*AccZinG))*1/(3.142/180);
+		angle_to_send.AnglePitch =-atan(AccXinG/sqrt(AccYinG*AccYinG+AccZinG*AccZinG))*1/(3.142/180);
+
+		xQueueSendToBack(queueAngle,&angle_to_send,portMAX_DELAY);
+
+	}
+}
+
+static void SunFounder_Task(void *pvParameters) {
+	Angle_data angle_read;
+
+	while (1) {
+
+		xQueueReceive(queueAngle, &angle_read, portMAX_DELAY);
+
+		if(angle_read.AngleRoll > 30){
+			Buzzer_On;
+		}else{
+			Buzzer_Off;
+		}
 
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
@@ -111,14 +146,20 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   I2Cdev_init(&hi2c1); // init of i2cdevlib.
-  // You can select other i2c device anytime and
-  // call the same driver functions on other sensors
 
-  MPU6050_setAddress(MPU6050_DEFAULT_ADDRESS);
   MPU6050_initialize();
 
 
-  xTaskCreate(MPU6050_Task,   			// Nombre de la función que se ejecutará como tarea
+  queueAngle = xQueueCreate(1,sizeof(Angle_data));
+
+  xTaskCreate(MPU6050_Task,
+  			"",
+  			configMINIMAL_STACK_SIZE,
+  			NULL,
+  			2,
+  			NULL);
+
+  xTaskCreate(SunFounder_Task,   			// Nombre de la función que se ejecutará como tarea
   			"",                      	// Nombre de la tarea (cadena vacía)
   			configMINIMAL_STACK_SIZE,	// Tamaño de la pila asignado a la tarea
   			NULL, 						// Puntero a información que se pasará como argumento a la tarea
