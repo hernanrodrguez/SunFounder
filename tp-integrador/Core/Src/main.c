@@ -149,6 +149,8 @@ int main(void)
 
   MPU6050_initialize();
 
+  //lcd_init(&hi2c1, 0x27);
+
 
   queueAngle = xQueueCreate(1,sizeof(Angle_data));
 
