@@ -14,18 +14,15 @@ I2C_HandleTypeDef *i2c;
 I2C_ID_T i2c;
 #endif
 
-// Tipicamente 0x27 o 0x3f
-static uint8_t pc8574_7bit_addr;
-
 /* Quick helper function for single byte transfers */
 void i2c_write_byte(uint8_t val) {
 	// Envio byte por I2C
-	i2c_transmit_byte(i2c, pc8574_7bit_addr, val);
+	i2c_transmit_byte(i2c, ADDR, val);
 }
 
 void lcd_toggle_enable(uint8_t val) {
     // Toggle enable pin on LCD display
-    for(uint32_t i = 0; i < 5000; i++);
+	for(uint32_t i = 0; i < 5000; i++);
 	i2c_write_byte(val | LCD_ENABLE_BIT);
 	for(uint32_t i = 0; i < 5000; i++);
 	i2c_write_byte((uint8_t)(val & ~LCD_ENABLE_BIT));
@@ -60,7 +57,7 @@ void lcd_string(const char *s) {
 }
 
 #ifdef STM32F103xB
-void lcd_init(I2C_HandleTypeDef *hi2c1, uint8_t address) {
+void lcd_init(I2C_HandleTypeDef *hi2c1) {
 	// Guardo el I2C usado
 	i2c = hi2c1;
 #elif defined(__LPC17XX__)
@@ -68,8 +65,6 @@ void lcd_init(I2C_ID_T i2c_id) {
 	// Guardo el I2C usado
 	i2c = i2c_id;
 #endif
-	// Guardo el valor de direccion de 7 bits
-	pc8574_7bit_addr = address;
 
     lcd_send_byte(0x03, LCD_COMMAND);
     lcd_send_byte(0x03, LCD_COMMAND);

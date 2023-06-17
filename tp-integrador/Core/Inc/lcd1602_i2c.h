@@ -47,6 +47,9 @@
 
 #define LCD_ENABLE_BIT 0x04
 
+// By default these LCD display drivers are on bus address 0x3f
+#define ADDR (0x27)
+
 // Modes for lcd_send_byte
 #define LCD_CHARACTER  1
 #define LCD_COMMAND    0
@@ -57,11 +60,11 @@
 #ifdef STM32F103xB
 #define i2c_transmit_byte(i2c, addr, val)	HAL_I2C_Master_Transmit(i2c, (addr << 1), &val, 1, 100)
 // Prototipo para inicializar LCD
-void lcd_init(I2C_HandleTypeDef *hi2c1, uint8_t address);
+void lcd_init(I2C_HandleTypeDef *hi2c1);
 #elif defined(__LPC17XX__)
 #define i2c_transmit_byte(i2c, addr, val)	Chip_I2C_MasterSend(i2c, addr, &val, 1)
 // Prototipo para inicializar LCD
-void lcd_init(I2C_ID_T i2c_id, uint8_t address);
+void lcd_init(I2C_ID_T i2c_id);
 #endif
 
 // Prototipos de funciones

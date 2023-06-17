@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-#define DEBOUNCE_TICKS 	(4000)
+#define DEBOUNCE_TICKS 	(500)
 
 
 typedef enum {
