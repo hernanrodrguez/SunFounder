@@ -25,7 +25,7 @@
 #include "FreeRTOS.h"
 #include "keypad.h"
 #include "task.h"
-#include "lcd1602_i2c.h"
+#include "lcd_i2c_pcf8574.h"
 #include "MPU6050.h"
 #include "I2Cdev.h"
 #include "queue.h"
@@ -64,6 +64,7 @@ typedef struct{
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
+I2C_HandleTypeDef hi2c2;
 
 /* USER CODE BEGIN PV */
 
@@ -85,6 +86,7 @@ char string[128]; // Sin el static el count del semaforo volaba (raro)
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_I2C2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -138,9 +140,9 @@ static void LCD_Print(void *pvParameters) {
 	while(1)
 	{
 		if(pdTRUE == xQueueReceive(queueLCD, &lcd_data_keyboard, 0)){
-			//lcd_clear();
+			lcd_Clearscreen();
 			sprintf(string,"%.*d",3,lcd_data_keyboard.AngleValue);
-			//lcd_string(string);
+			lcd_SendString(string);
 		}
 
 	}
@@ -296,12 +298,20 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
-
-  //lcd_init(&hi2c1);
 
   I2Cdev_init(&hi2c1); // init of i2cdevlib.
   MPU6050_initialize();
+
+
+  //LCD todo
+  lcd_Init();
+  lcd_SetCursor(0, 0);
+  lcd_SendString("Salom");
+  lcd_SetCursor(0, 1);
+  lcd_SendString("Duniyo!");
+
 
   //KeyPad Init
   debounce_init(&deb_col_1, 1, DEBOUNCE_TICKS);
@@ -424,6 +434,40 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
+  * @brief I2C2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C2_Init(void)
+{
+
+  /* USER CODE BEGIN I2C2_Init 0 */
+
+  /* USER CODE END I2C2_Init 0 */
+
+  /* USER CODE BEGIN I2C2_Init 1 */
+
+  /* USER CODE END I2C2_Init 1 */
+  hi2c2.Instance = I2C2;
+  hi2c2.Init.ClockSpeed = 100000;
+  hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c2.Init.OwnAddress1 = 0;
+  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c2.Init.OwnAddress2 = 0;
+  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C2_Init 2 */
+
+  /* USER CODE END I2C2_Init 2 */
 
 }
 
