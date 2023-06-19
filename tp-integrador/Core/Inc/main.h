@@ -72,7 +72,7 @@ void Error_Handler(void);
 #define COL_2_GPIO_Port GPIOA
 #define COL_3_Pin GPIO_PIN_7
 #define COL_3_GPIO_Port GPIOA
-#define BuzzerGPIO_Pin GPIO_PIN_11
+#define BuzzerGPIO_Pin GPIO_PIN_12
 #define BuzzerGPIO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 

@@ -64,6 +64,7 @@ typedef struct{
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
+I2C_HandleTypeDef hi2c2;
 
 /* USER CODE BEGIN PV */
 
@@ -85,6 +86,7 @@ char string[128]; // Sin el static el count del semaforo volaba (raro)
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
+static void MX_I2C2_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -138,9 +140,9 @@ static void LCD_Print(void *pvParameters) {
 	while(1)
 	{
 		if(pdTRUE == xQueueReceive(queueLCD, &lcd_data_keyboard, 0)){
-			//lcd_clear();
+			lcd_clear();
 			sprintf(string,"%.*d",3,lcd_data_keyboard.AngleValue);
-			//lcd_string(string);
+			lcd_string(string);
 		}
 
 	}
@@ -296,12 +298,14 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
+  MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
 
-  //lcd_init(&hi2c1);
+  lcd_init(&hi2c2);
 
   I2Cdev_init(&hi2c1); // init of i2cdevlib.
   MPU6050_initialize();
+
 
   //KeyPad Init
   debounce_init(&deb_col_1, 1, DEBOUNCE_TICKS);
@@ -310,30 +314,31 @@ int main(void)
 
   queueAngle = xQueueCreate(1,sizeof(Angle_data));
   queueKey = xQueueCreate(1,sizeof(uint8_t));
+  queueLCD = xQueueCreate(1,sizeof(LCD_data));
 
   xTaskCreate(MPU6050_Task,
-  			"",
+  			"MPU6050_Task",
   			configMINIMAL_STACK_SIZE,
   			NULL,
   			2,
   			NULL);
 
   xTaskCreate(KeyPad_Task,
-  			"",
+  			"KeyPad_Task",
   			configMINIMAL_STACK_SIZE,
   			NULL,
   			2,
   			NULL);
 
   xTaskCreate(LCD_Print,
-  			"",
+  			"LCD_Print",
   			configMINIMAL_STACK_SIZE,
   			NULL,
   			2,
   			NULL);
 
   xTaskCreate(SunFounder_Task,   			// Nombre de la función que se ejecutará como tarea
-  			"",                      	// Nombre de la tarea (cadena vacía)
+  			"SunFounder_Task",                      	// Nombre de la tarea (cadena vacía)
   			configMINIMAL_STACK_SIZE,	// Tamaño de la pila asignado a la tarea
   			NULL, 						// Puntero a información que se pasará como argumento a la tarea
   			2,                       	// Prioridad de la tarea
@@ -428,6 +433,40 @@ static void MX_I2C1_Init(void)
 }
 
 /**
+  * @brief I2C2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_I2C2_Init(void)
+{
+
+  /* USER CODE BEGIN I2C2_Init 0 */
+
+  /* USER CODE END I2C2_Init 0 */
+
+  /* USER CODE BEGIN I2C2_Init 1 */
+
+  /* USER CODE END I2C2_Init 1 */
+  hi2c2.Instance = I2C2;
+  hi2c2.Init.ClockSpeed = 100000;
+  hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c2.Init.OwnAddress1 = 0;
+  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c2.Init.OwnAddress2 = 0;
+  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN I2C2_Init 2 */
+
+  /* USER CODE END I2C2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -473,6 +512,27 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
