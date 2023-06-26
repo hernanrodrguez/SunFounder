@@ -132,10 +132,10 @@ static void MPU6050_Task(void *pvParameters) {
 
 		angle_to_send.AngleRoll = atan(
 				AccYinG / sqrt(AccXinG * AccXinG + AccZinG * AccZinG)) * 1
-				/ (3.142 / 180);
+				/ (3.142 / 180) + 90;
 		angle_to_send.AnglePitch = atan(
 				AccXinG / sqrt(AccYinG * AccYinG + AccZinG * AccZinG)) * 1
-				/ (3.142 / 180);
+				/ (3.142 / 180) + 90;
 
 		xQueueSendToBack(queueAngle, &angle_to_send, portMAX_DELAY);
 
