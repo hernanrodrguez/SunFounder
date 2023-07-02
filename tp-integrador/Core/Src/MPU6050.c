@@ -62,7 +62,7 @@ void MPU6050_initialize() {
     devAddr = MPU6050_DEFAULT_ADDRESS;
     MPU6050_setClockSource(MPU6050_CLOCK_PLL_XGYRO);
     MPU6050_setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-    MPU6050_setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
+    MPU6050_setFullScaleAccelRange(MPU6050_ACCEL_FS_8); //Change in SunFounder
     MPU6050_setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
 
 }

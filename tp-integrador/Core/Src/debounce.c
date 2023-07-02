@@ -11,7 +11,7 @@
  * \fn 		: void debounce_init(debounce_t *s, uint8_t active_low, uint16_t debounce)
  * \brief 	: Inicializa las columnas
  * \details : Se setea una struct para manejar cada columna
- * \author 	: Tobias Bavasso Piizzi
+ * \author 	: Hernan
  * \date   	: 26/09/2021
  * \param 	: [in] debounce_t *s
  * \param 	: [in] uint8_t active_low
@@ -31,7 +31,7 @@ void debounce_init(debounce_t *s, uint8_t active_low, uint16_t debounce){
  * \fn 		: void debounce_check(debounce_t *s, uint32_t state)
  * \brief 	: Chequea el estado del pulsador/columna
  * \details : Es la MdE que filtra el rebote en cada entrada
- * \author 	: Tobias Bavasso Piizzi
+ * \author 	: Hernan
  * \date   	: 26/09/2021
  * \param 	: [in] debounce_t *s
  * \param 	: [in] uint32_t state
@@ -88,7 +88,7 @@ void debounce_check(debounce_t *s, uint32_t state){
  * \fn 		: int debounce_edge(debounce_t *s)
  * \brief 	: Verifica el sentido del pulso
  * \details : Sirve para distinguir un pulsador apretado continuo
- * \author 	: Tobias Bavasso Piizzi
+ * \author 	: Hernan
  * \date   	: 26/09/2021
  * \param 	: [in] debounce_t *s
  * \return 	: int :	1 == nuevo pulso, 0 == se mantuvo
@@ -101,7 +101,7 @@ int debounce_edge(debounce_t *s){
  * \fn 		: btn_state debounce_btn_state(debounce_t *s)
  * \brief 	: Estado actual
  * \details : Devuelve el estado actual del boton
- * \author 	: Tobias Bavasso Piizzi
+ * \author 	: Hernan
  * \date   	: 26/09/2021
  * \param 	: [in] debounce_t *s
  * \return 	: btn_state : 0 btn == free , 1 btn == hold

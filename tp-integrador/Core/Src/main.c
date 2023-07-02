@@ -70,7 +70,7 @@ typedef struct {
 
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
-I2C_HandleTypeDef hi2c2;
+I2C_HandleTypeDef hi2c2; //Por Hardfault
 
 RTC_HandleTypeDef hrtc;
 
@@ -103,18 +103,45 @@ static void MX_RTC_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+/**
+ * \fn 		: saveAngleSet
+ * \brief 	: Guarda el angulo a la Sram del RTC
+ * \details :
+ * \author 	: PR2
+ * \date   	: 01/07/2023
+ * \param 	: [in] uint8_t whichAngle : ROLL_ANGLE_EEPROM or PITCH_ANGLE_EEPROM
+ * \param 	: [in] uint8_t angle : Valor a almacenar
+ * \return 	: void
+ * */
 void saveAngleSet(uint8_t angle, uint8_t whichAngle){
 
 	HAL_RTCEx_BKUPWrite(&hrtc, whichAngle, angle);
 
 }
-
+/**
+ * \fn 		: readAngleSet
+ * \brief 	: Lee el angulo desde la Sram del RTC
+ * \details :
+ * \author 	: PR2
+ * \date   	: 01/07/2023
+ * \param 	: [in] uint8_t whichAngle : ROLL_ANGLE_EEPROM or PITCH_ANGLE_EEPROM
+ * \return 	: uint8_t: Valor del angulo almacenado
+ * */
 uint8_t readAngleSet(uint8_t whichAngle){
 
 	return (uint8_t) HAL_RTCEx_BKUPRead(&hrtc, whichAngle);
 
 }
 
+/**
+ * \fn 		: MPU6050_Task
+ * \brief 	: Obtiene aceleracion y devuelve el calculo del angulo.
+ * \details : Se ejecuta cada vez que se libera la cola queueAngle.
+ * \author 	: PR2
+ * \date   	: 01/07/2023
+ * \param 	: Void
+ * \return 	: Void
+ * */
 static void MPU6050_Task(void *pvParameters) {
 	int16_t ax, ay, az;
 
@@ -142,6 +169,15 @@ static void MPU6050_Task(void *pvParameters) {
 	}
 }
 
+/**
+ * \fn 		: KeyPad_Task
+ * \brief 	: Lee el teclado e envia a una cola el valor.
+ * \details : Se ejecuta cada vez que se libera la cola queueKey.
+ * \author 	: PR2
+ * \date   	: 01/07/2023
+ * \param 	: Void
+ * \return 	: Void
+ * */
 static void KeyPad_Task(void *pvParameters) {
 
 	static uint8_t key;
@@ -157,48 +193,65 @@ static void KeyPad_Task(void *pvParameters) {
 
 }
 
+/**
+ * \fn 		: LCD_Print
+ * \brief 	: Escribe en Pantalla
+ * \details : Lee la cola LCD que administra sus recursos.
+ * \author 	: PR2
+ * \date   	: 01/07/2023
+ * \param 	: Void
+ * \return 	: Void
+ * */
 static void LCD_Print(void *pvParameters) {
 
 	LCD_data lcd_data_keyboard;
 
 	while (1) {
-		if (pdTRUE == xQueueReceive(queueLCD, &lcd_data_keyboard, 0)) {
-			//todo maquina de estados lcd
-			switch (lcd_data_keyboard.WhichAngle) {
-			case NO_ANGLE_LCD:
-				lcd_set_cursor(1, 6);
-				sprintf(string, "S%.*d", 3, lcd_data_keyboard.AngleValue);
-				lcd_string(string);
-				break;
-			case ROLL_ANGLE_SET:
-				lcd_set_cursor(1, 0);
-				sprintf(string, "R:%.*d", 3, lcd_data_keyboard.AngleValue);
-				lcd_string(string);
-				break;
-			case PITCH_ANGLE_SET:
-				lcd_set_cursor(1, 11);
-				sprintf(string, "P:%.*d", 3, lcd_data_keyboard.AngleValue);
-				lcd_string(string);
-				break;
-			case PITCH_ANGLE_LCD:
-				lcd_set_cursor(0, 11);
-				sprintf(string, "P:%.*d", 3, lcd_data_keyboard.AngleValue);
-				lcd_string(string);
-				break;
-			case ROLL_ANGLE_LCD:
-				lcd_set_cursor(0, 0);
-				sprintf(string, "R:%.*d", 3, lcd_data_keyboard.AngleValue);
-				lcd_string(string);
-				break;
 
-			default:
-				break;
-			}
+		xQueueReceive(queueLCD, &lcd_data_keyboard, portMAX_DELAY);
+
+		switch (lcd_data_keyboard.WhichAngle) {
+		case NO_ANGLE_LCD:
+			lcd_set_cursor(1, 6);
+			sprintf(string, "S%.*d", 3, lcd_data_keyboard.AngleValue);
+			lcd_string(string);
+			break;
+		case ROLL_ANGLE_SET:
+			lcd_set_cursor(1, 0);
+			sprintf(string, "R:%.*d", 3, lcd_data_keyboard.AngleValue);
+			lcd_string(string);
+			break;
+		case PITCH_ANGLE_SET:
+			lcd_set_cursor(1, 11);
+			sprintf(string, "P:%.*d", 3, lcd_data_keyboard.AngleValue);
+			lcd_string(string);
+			break;
+		case PITCH_ANGLE_LCD:
+			lcd_set_cursor(0, 11);
+			sprintf(string, "P:%.*d", 3, lcd_data_keyboard.AngleValue);
+			lcd_string(string);
+			break;
+		case ROLL_ANGLE_LCD:
+			lcd_set_cursor(0, 0);
+			sprintf(string, "R:%.*d", 3, lcd_data_keyboard.AngleValue);
+			lcd_string(string);
+			break;
+		default:
+			break;
 		}
 	}
-
 }
 
+
+/**
+ * \fn 		: SunFounder_Task
+ * \brief 	: Maquina principal que administra la UI y el resto de colas
+ * \details : Se encarga de la alarma, cola del MPU, cola de la key y envia a la cola LCD
+ * \author 	: PR2
+ * \date   	: 01/07/2023
+ * \param 	: Void
+ * \return 	: Void
+ * */
 static void SunFounder_Task(void *pvParameters) {
 
 	typedef enum {
@@ -220,6 +273,7 @@ static void SunFounder_Task(void *pvParameters) {
 	static uint8_t pitch_angle_set;
 	static uint8_t roll_angle_set;
 
+	/*------Leemos Sram e inicializamos LCD----------*/
 	pitch_angle_set = readAngleSet(PITCH_ANGLE_EEPROM);
 	lcd_data.AngleValue = pitch_angle_set;
 	lcd_data.WhichAngle = PITCH_ANGLE_SET;
@@ -238,7 +292,6 @@ static void SunFounder_Task(void *pvParameters) {
 
 		if (pdTRUE == xQueueReceive(queueAngle, &angle_read, 0)) {
 
-			//todo Hacer SmithTrigger la alarma
 			if ((angle_read.AngleRoll > roll_angle_set - 1
 					&& angle_read.AngleRoll < roll_angle_set + 1)
 					|| (angle_read.AnglePitch > pitch_angle_set - 1
@@ -401,36 +454,38 @@ int main(void)
 	debounce_init(&deb_col_2, 1, DEBOUNCE_TICKS);
 	debounce_init(&deb_col_3, 1, DEBOUNCE_TICKS);
 
-	queueAngle = xQueueCreate(1, sizeof(Angle_data));
-	queueKey = xQueueCreate(1, sizeof(uint8_t));
-	queueLCD = xQueueCreate(1, sizeof(LCD_data));
+	/*------ Creacion de colas y registro para el Debug ------------*/
+	queueAngle = xQueueCreate(1, sizeof(Angle_data)); 	//La escribe la tarea MPU y la consume la tarea Sunfounder.
+	queueKey = xQueueCreate(1, sizeof(uint8_t)); 		//La escribe la tarea KeyPadTask, solo cuando se apreta, la consume Sunfounder
+	queueLCD = xQueueCreate(1, sizeof(LCD_data));		//La escribe Sunfounder y la consume LCDTask
 
 	vQueueAddToRegistry(queueLCD, "Queue LCD");
 	vQueueAddToRegistry(queueKey, "Queue Key");
 	vQueueAddToRegistry(queueAngle, "Queue MPU");
 
 
+	/*------ Creacion de tareas ------------*/
 	xTaskCreate(MPU6050_Task, "MPU6050_Task",
 	configMINIMAL_STACK_SIZE,
-	NULL, 2,
+	NULL, 3,
 	NULL);
 
 	xTaskCreate(KeyPad_Task, "KeyPad_Task",
 	configMINIMAL_STACK_SIZE,
-	NULL, 2,
+	NULL, 3,
 	NULL);
 
 	xTaskCreate(LCD_Print, "LCD_Print",
 	configMINIMAL_STACK_SIZE,
-	NULL, 2,
+	NULL, 3,
 	NULL);
 
-	xTaskCreate(SunFounder_Task, // Nombre de la función que se ejecutará como tarea
+	xTaskCreate(SunFounder_Task, 			// Nombre de la función que se ejecutará como tarea
 			"SunFounder_Task",              // Nombre de la tarea (cadena vacía)
-			configMINIMAL_STACK_SIZE,	// Tamaño de la pila asignado a la tarea
-			NULL, // Puntero a información que se pasará como argumento a la tarea
-			2,                       	// Prioridad de la tarea
-			NULL); // Puntero a variable para almacenar el identificador de la tarea
+			configMINIMAL_STACK_SIZE,		// Tamaño de la pila asignado a la tarea
+			NULL, 							// Puntero a información que se pasará como argumento a la tarea
+			3,                       		// Prioridad de la tarea
+			NULL); 							// Puntero a variable para almacenar el identificador de la tarea
 
 	vTaskStartScheduler();
 
