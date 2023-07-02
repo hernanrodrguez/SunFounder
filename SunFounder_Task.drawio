@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-07-02T19:25:02.824Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="TsEfSgQTR5lQ1suu1nGg" version="21.5.2" type="device">
+<mxfile host="app.diagrams.net" modified="2023-07-02T22:02:20.450Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="jvq5LgFfgqCRkt6zunLF" version="21.5.2" type="device">
   <diagram name="Página-1" id="GHXymu-3WpsnjIPBxjAS">
     <mxGraphModel dx="978" dy="1757" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -34,13 +34,13 @@
         <mxCell id="hy9y8dTizZnrj0Jon9Ji-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="hy9y8dTizZnrj0Jon9Ji-11" target="hy9y8dTizZnrj0Jon9Ji-12">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="hy9y8dTizZnrj0Jon9Ji-11" value="Buzzer_On();" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="hy9y8dTizZnrj0Jon9Ji-11" value="Buzzer_On();&lt;br&gt;imprimirLCD();" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="841" y="30" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="hy9y8dTizZnrj0Jon9Ji-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="hy9y8dTizZnrj0Jon9Ji-12" target="hy9y8dTizZnrj0Jon9Ji-11">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="hy9y8dTizZnrj0Jon9Ji-12" value="Buzzer_Off();" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="hy9y8dTizZnrj0Jon9Ji-12" value="Buzzer_Off();&lt;br&gt;imprimirLCD();" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="581" y="30" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="hy9y8dTizZnrj0Jon9Ji-14" value="&lt;div&gt;(angle_read.AngleRoll &amp;gt; roll_angle_set - 1&lt;/div&gt;&lt;div&gt;&amp;amp;&amp;amp; angle_read.AngleRoll &amp;lt; roll_angle_set + 1)&lt;span style=&quot;&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/span&gt;|| (angle_read.AnglePitch &amp;gt; pitch_angle_set - 1&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt;&lt;/span&gt;&amp;amp;&amp;amp; angle_read.AnglePitch &amp;lt; pitch_angle_set + 1)&lt;/span&gt;&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
@@ -177,7 +177,7 @@
         <mxCell id="hy9y8dTizZnrj0Jon9Ji-67" value="saveAngleSet(pitch_angle_set)&lt;br&gt;xQueueSendToBack(queueLCD, &amp;amp;lcd_data, portMAX_DELAY)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="346" y="770" width="270" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="hy9y8dTizZnrj0Jon9Ji-68" value="xQueueReceive(queueLCD, &amp;amp;lcd_data_keyboard, 0)" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="hy9y8dTizZnrj0Jon9Ji-68" value="xQueueReceive(queueLCD, &amp;amp;lcd_data_keyboard, portMAX_DELAY)" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="434" y="1000" width="322" height="110" as="geometry" />
         </mxCell>
         <mxCell id="hy9y8dTizZnrj0Jon9Ji-70" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="hy9y8dTizZnrj0Jon9Ji-69" target="hy9y8dTizZnrj0Jon9Ji-68">
